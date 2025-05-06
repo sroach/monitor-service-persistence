@@ -32,4 +32,8 @@ interface MonitorRecordRepository : CrudRepository<MonitorRecord, Long> {
         ) latest ON mr.NAME = latest.NAME AND mr.URL = latest.URL AND mr.TIMESTAMP = latest.MAX_TIMESTAMP
     """)
     fun findUniqueByNameAndUrl(): List<MonitorRecord>
+
+    @Query("SELECT * FROM MONITOR_RECORDS WHERE NAME= :name AND TIMESTAMP >= :fromTime ORDER BY TIMESTAMP DESC")
+    fun findByNameAndTimestampAfter(name: String, fromTime: LocalDateTime): List<MonitorRecord>
+
 }
