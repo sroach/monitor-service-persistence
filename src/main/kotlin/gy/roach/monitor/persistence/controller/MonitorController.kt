@@ -9,15 +9,19 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @RestController
 @RequestMapping("/api/records")
 @Tag(name = "Monitor Records", description = "API for managing monitor records")
 class MonitorController(private val monitorService: MonitorService) {
+
+    private val logger = LoggerFactory.getLogger(this.javaClass)
 
     @PostMapping
     @Operation(summary = "Create a new monitor record", description = "Creates a new monitor record with the provided data")
@@ -115,9 +119,10 @@ class MonitorController(private val monitorService: MonitorService) {
         @PathVariable timestamp: String
     ): ResponseEntity<*> {
         return try {
-            val dateTime = LocalDateTime.parse(timestamp)
+            val dateTime = LocalDateTime.parse(timestamp, DateTimeFormatter.ISO_DATE_TIME)
             ResponseEntity(monitorService.getRecordsSinceTimestamp(name,  dateTime), HttpStatus.OK)
         } catch (e: Exception) {
+            logger.error("Invalid timestamp format: $timestamp", e)
             ResponseEntity("Invalid timestamp format. Use ISO format (e.g., '2023-06-15T10:15:30')", HttpStatus.BAD_REQUEST)
         }
     }
