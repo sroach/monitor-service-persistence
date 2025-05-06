@@ -34,6 +34,6 @@ interface MonitorRecordRepository : CrudRepository<MonitorRecord, Long> {
     fun findUniqueByNameAndUrl(): List<MonitorRecord>
 
     @Query("SELECT * FROM MONITOR_RECORDS WHERE NAME= :name AND TIMESTAMP >= :fromTime ORDER BY TIMESTAMP DESC")
-    fun findByNameAndTimestampAfter(name: String, fromTime: LocalDateTime): List<MonitorRecord>
+    fun findByNameAndTimestampAfter(name: String, fromTime: String): List<MonitorRecord>
 
 }

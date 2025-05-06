@@ -52,7 +52,7 @@ class MonitorService(private val repository: MonitorRecordRepository) {
     }
 
     @Transactional(readOnly = true)
-    fun getRecordsSinceTimestamp(name: String, timestamp: LocalDateTime): List<MonitorRecord> {
+    fun getRecordsSinceTimestamp(name: String, timestamp: String): List<MonitorRecord> {
         return repository.findByNameAndTimestampAfter(name, timestamp)
     }
 

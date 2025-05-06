@@ -13,8 +13,14 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.*
+
 
 @RestController
 @RequestMapping("/api/records")
@@ -119,8 +125,13 @@ class MonitorController(private val monitorService: MonitorService) {
         @PathVariable timestamp: String
     ): ResponseEntity<*> {
         return try {
-            val dateTime = LocalDateTime.parse(timestamp, DateTimeFormatter.ISO_DATE_TIME)
-            ResponseEntity(monitorService.getRecordsSinceTimestamp(name,  dateTime), HttpStatus.OK)
+            //val dateTime = LocalDateTime.parse(timestamp, DateTimeFormatter.ISO_DATE_TIME).atZone(TimeZone.getTimeZone("America/New_York").toZoneId())
+            val offsetDateTime = OffsetDateTime.parse(timestamp)
+            val localDateTime = offsetDateTime.atZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
+
+            val df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+            val recs = monitorService.getRecordsSinceTimestamp(URLDecoder.decode(name, StandardCharsets.UTF_8),  df.format(localDateTime))
+            ResponseEntity(recs, HttpStatus.OK)
         } catch (e: Exception) {
             logger.error("Invalid timestamp format: $timestamp", e)
             ResponseEntity("Invalid timestamp format. Use ISO format (e.g., '2023-06-15T10:15:30')", HttpStatus.BAD_REQUEST)
