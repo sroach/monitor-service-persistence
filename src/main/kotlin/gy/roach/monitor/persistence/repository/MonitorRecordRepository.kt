@@ -22,4 +22,14 @@ interface MonitorRecordRepository : CrudRepository<MonitorRecord, Long> {
 
     @Query("DELETE FROM MONITOR_RECORDS WHERE TIMESTAMP < :beforeTime")
     fun deleteByTimestampBefore(beforeTime: LocalDateTime): Int
+
+    @Query("""
+        SELECT mr.* FROM MONITOR_RECORDS mr
+        INNER JOIN (
+            SELECT NAME, URL, MAX(TIMESTAMP) as MAX_TIMESTAMP
+            FROM MONITOR_RECORDS
+            GROUP BY NAME, URL
+        ) latest ON mr.NAME = latest.NAME AND mr.URL = latest.URL AND mr.TIMESTAMP = latest.MAX_TIMESTAMP
+    """)
+    fun findUniqueByNameAndUrl(): List<MonitorRecord>
 }

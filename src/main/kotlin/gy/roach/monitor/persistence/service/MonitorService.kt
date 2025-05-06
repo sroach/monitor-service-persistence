@@ -46,6 +46,16 @@ class MonitorService(private val repository: MonitorRecordRepository) {
         return repository.findByTimestampAfter(fromTime)
     }
 
+    @Transactional(readOnly = true)
+    fun getUniqueRecordsByNameAndUrl(): List<MonitorRecord> {
+        return repository.findUniqueByNameAndUrl()
+    }
+
+    @Transactional(readOnly = true)
+    fun getRecordsSinceTimestamp(timestamp: LocalDateTime): List<MonitorRecord> {
+        return repository.findByTimestampAfter(timestamp)
+    }
+
     @Transactional
     fun deleteRecord(id: Long) {
         repository.deleteById(id)

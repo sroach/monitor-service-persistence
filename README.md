@@ -90,6 +90,7 @@ The Swagger UI provides an interactive interface to:
 | GET | `/api/records/{id}` | Get a monitor record by ID |
 | GET | `/api/records/name/{name}` | Get monitor records by name |
 | GET | `/api/records/last/{seconds}` | Get monitor records from the last n seconds |
+| GET | `/api/records/since/{timestamp}` | Get monitor records since a specific timestamp |
 | DELETE | `/api/records/{id}` | Delete a monitor record by ID |
 
 ### Request/Response Examples
@@ -181,6 +182,37 @@ Response:
 Request:
 ```http
 GET /monitor-persistence/api/records/last/3600
+```
+
+Response:
+```json
+[
+  {
+    "id": 1,
+    "name": "Google",
+    "url": "https://www.google.com",
+    "statusCode": 200,
+    "timestamp": "2023-06-15T10:15:30",
+    "responseTimeMs": 150,
+    "errorMessage": null
+  },
+  {
+    "id": 2,
+    "name": "GitHub",
+    "url": "https://github.com",
+    "statusCode": 200,
+    "timestamp": "2023-06-15T10:16:45",
+    "responseTimeMs": 250,
+    "errorMessage": null
+  }
+]
+```
+
+#### Get monitor records since a specific timestamp
+
+Request:
+```http
+GET /monitor-persistence/api/records/since/2023-06-15T10:00:00
 ```
 
 Response:

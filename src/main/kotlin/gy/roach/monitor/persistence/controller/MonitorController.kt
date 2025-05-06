@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("/api/records")
@@ -88,6 +89,35 @@ class MonitorController(private val monitorService: MonitorService) {
         @PathVariable seconds: Long
     ): ResponseEntity<List<MonitorRecord>> {
         return ResponseEntity(monitorService.getRecordsFromLastSeconds(seconds), HttpStatus.OK)
+    }
+
+    @GetMapping("/unique")
+    @Operation(summary = "Get unique monitor records by name and URL", description = "Retrieves a list of monitor records where each name and URL combination appears only once (the most recent record)")
+    @ApiResponses(value = [
+        ApiResponse(responseCode = "200", description = "Successfully retrieved unique records",
+            content = [Content(mediaType = "application/json", schema = Schema(implementation = MonitorRecord::class))])
+    ])
+    fun getUniqueRecordsByNameAndUrl(): ResponseEntity<List<MonitorRecord>> {
+        return ResponseEntity(monitorService.getUniqueRecordsByNameAndUrl(), HttpStatus.OK)
+    }
+
+    @GetMapping("/since/{timestamp}")
+    @Operation(summary = "Get monitor records since a specific timestamp", description = "Retrieves all monitor records with timestamps after the specified time")
+    @ApiResponses(value = [
+        ApiResponse(responseCode = "200", description = "Successfully retrieved records",
+            content = [Content(mediaType = "application/json", schema = Schema(implementation = MonitorRecord::class))]),
+        ApiResponse(responseCode = "400", description = "Invalid timestamp format", content = [Content()])
+    ])
+    fun getRecordsSinceTimestamp(
+        @Parameter(description = "Timestamp in ISO format (e.g., '2023-06-15T10:15:30')", required = true)
+        @PathVariable timestamp: String
+    ): ResponseEntity<*> {
+        return try {
+            val dateTime = LocalDateTime.parse(timestamp)
+            ResponseEntity(monitorService.getRecordsSinceTimestamp(dateTime), HttpStatus.OK)
+        } catch (e: Exception) {
+            ResponseEntity("Invalid timestamp format. Use ISO format (e.g., '2023-06-15T10:15:30')", HttpStatus.BAD_REQUEST)
+        }
     }
 
     @DeleteMapping("/{id}")
