@@ -6,9 +6,11 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
+import org.slf4j.LoggerFactory
 
 @Service
 class MonitorService(private val repository: MonitorRecordRepository) {
+    private val logger = LoggerFactory.getLogger(MonitorService::class.java)
 
     @Transactional
     fun saveRecord(name: String, url: String, statusCode: Int, responseTimeMs: Long, errorMessage: String? = null): MonitorRecord {
@@ -47,5 +49,19 @@ class MonitorService(private val repository: MonitorRecordRepository) {
     @Transactional
     fun deleteRecord(id: Long) {
         repository.deleteById(id)
+    }
+
+    /**
+     * Deletes records older than the specified number of days.
+     * @param days The number of days to keep records for
+     * @return The number of records deleted
+     */
+    @Transactional
+    fun deleteRecordsOlderThan(days: Long): Int {
+        val cutoffDate = LocalDateTime.now().minus(days, ChronoUnit.DAYS)
+        logger.info("Deleting records older than: $cutoffDate")
+        val deletedCount = repository.deleteByTimestampBefore(cutoffDate)
+        logger.info("Deleted $deletedCount old records")
+        return deletedCount
     }
 }

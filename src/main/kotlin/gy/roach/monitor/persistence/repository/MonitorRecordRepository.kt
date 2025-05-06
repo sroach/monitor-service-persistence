@@ -16,4 +16,10 @@ interface MonitorRecordRepository : CrudRepository<MonitorRecord, Long> {
 
     @Query("SELECT * FROM MONITOR_RECORDS WHERE TIMESTAMP >= :fromTime ORDER BY TIMESTAMP DESC")
     fun findByTimestampAfter(fromTime: LocalDateTime): List<MonitorRecord>
+
+    @Query("SELECT * FROM MONITOR_RECORDS WHERE TIMESTAMP < :beforeTime")
+    fun findByTimestampBefore(beforeTime: LocalDateTime): List<MonitorRecord>
+
+    @Query("DELETE FROM MONITOR_RECORDS WHERE TIMESTAMP < :beforeTime")
+    fun deleteByTimestampBefore(beforeTime: LocalDateTime): Int
 }

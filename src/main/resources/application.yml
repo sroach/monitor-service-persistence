@@ -19,6 +19,16 @@ spring:
       ddl-auto: update
     show-sql: true
 
+# Monitor data retention configuration
+monitor:
+  data:
+    # Number of days to keep monitor records (default: 7 days)
+    retention:
+      days: 7
+    # Cron expression for the cleanup job (default: midnight every day)
+    cleanup:
+      cron: "0 0 0 * * ?"
+
 # OpenAPI Configuration
 springdoc:
   api-docs:
